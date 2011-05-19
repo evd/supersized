@@ -734,6 +734,62 @@
 			resizenow();
 			
 		}
+
+		//Go to slide by index
+		function go(index) {
+		
+		    var slides = options.slides;	//Pull in slides array
+			
+			var currentslide = element.find('.activeslide');		//Find active slide
+			
+		    if ( currentslide.length == 0 ) currentslide = element.find('a:last');	//If end of set, note this is last slide
+		    var nextslide = currentslide.next().length ? currentslide.next() : element.find('a:first');
+			var prevslide = currentslide.prev().length ? currentslide.prev() : element.find('a:last');
+			
+			//Get the slide numbers of new slides
+			currentSlide = (index>0 && index<=slides.length)?index-1:0;
+			prevSlide = (currentSlide>=0)?currentSlide-1:slides.length-1;
+			nextSlide = (currentSlide<slides.length-1)?currentSlide+1:0;
+			
+			/**** Images Loading, replace current slides ****/
+			imageLink = (options.slides[prevSlide].url) ? "href='" + options.slides[prevSlide].url + "'" : "";	//If link exists, build it
+			prevslide.replaceWith($("<img/>").attr("src", options.slides[prevSlide].image).appendTo(element).wrap("<a " + imageLink + linkTarget + "></a>").parent());	//Append new image
+			imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";	//If link exists, build it
+			currentslide.replaceWith($("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap("<a " + imageLink + linkTarget + "></a>").parent());	//Append new image
+			imageLink = (options.slides[nextSlide].url) ? "href='" + options.slides[nextSlide].url + "'" : "";	//If link exists, build it
+			nextslide.replaceWith($("<img/>").attr("src", options.slides[nextSlide].image).appendTo(element).wrap("<a " + imageLink + linkTarget + "></a>").parent());	//Append new image
+			
+			//Update thumbnails (if enabled)
+			if (options.thumbnail_navigation == 1){
+			
+				//Load previous thumbnail
+				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevSlide].image));
+			
+				//Load next thumbnail
+				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextSlide].image));
+				
+			}
+			
+			/**** End Images Loading ****/
+			
+			//Update slide number
+			if (options.slide_counter){
+			    $('#slidecounter .slidenumber').html(currentSlide + 1);
+			}
+			
+			//Update captions
+		    if (options.slide_captions){
+		    	(options.slides[currentSlide].title) ? $('#slidecaption').html(options.slides[currentSlide].title) : $('#slidecaption').html('');
+		    }
+		    
+		    element.find('a:first').next().addClass('activeslide');	//Update active slide
+			inAnimation = false;
+
+		}
+        
+        $.supersized.go = go;
+		
+
 		
 	};
 		
