@@ -47,7 +47,9 @@
 			navigation              :   1,		//Slideshow controls on/off
 			thumbnail_navigation    :   0,		//Thumbnail navigation
 			slide_counter           :   1,		//Display slide numbers
-			slide_captions          :   1		//Slide caption (Pull from "title" in slides array)
+			slide_captions          :   1,		//Slide caption (Pull from "title" in slides array)
+			
+			slidechange				:	null
 			
     	};
 		
@@ -112,7 +114,11 @@
 		}
 		/***End load initial images***/
 		
-		element.hide();					//Hide image to be faded in
+		if (typeof options.slidechange == "function") {
+			options.slidechange(currentSlide+1);
+		}
+
+			element.hide();					//Hide image to be faded in
 		$('#controls-wrapper').hide();	//Hide controls to be displayed
 		
 		//Account for loading in IE
@@ -594,6 +600,10 @@
 		    
 		    nextslide.hide().addClass('activeslide');	//Update active slide
 		    
+			if (typeof options.slidechange == "function") {
+				options.slidechange(currentSlide+1);
+			}
+
 	    	switch(options.transition){
 	    		
 	    		case 0:    //No transition
@@ -689,6 +699,10 @@
 			
 		    nextslide.hide().addClass('activeslide');	//Update active slide
 		    
+			if (typeof options.slidechange == "function") {
+				options.slidechange(currentSlide+1);
+			}
+			
 		    switch(options.transition){
 		    		
 	    		case 0:    //No transition
@@ -738,7 +752,16 @@
 		//Go to slide by index
 		function go(index) {
 		
-		    var slides = options.slides;	//Pull in slides array
+		    if (currentSlide==(index-1)) return false;
+			if (index<1 || index>options.slides.length) {
+				if (typeof options.slidechange == "function") {
+					options.slidechange(1);
+				}
+				return false;
+			
+			}
+			
+			var slides = options.slides;	//Pull in slides array
 			
 			var currentslide = element.find('.activeslide');		//Find active slide
 			
@@ -748,7 +771,7 @@
 			
 			//Get the slide numbers of new slides
 			currentSlide = (index>0 && index<=slides.length)?index-1:0;
-			prevSlide = (currentSlide>=0)?currentSlide-1:slides.length-1;
+			prevSlide = (currentSlide>0)?currentSlide-1:slides.length-1;
 			nextSlide = (currentSlide<slides.length-1)?currentSlide+1:0;
 			
 			/**** Images Loading, replace current slides ****/
@@ -784,7 +807,8 @@
 		    
 		    element.find('a:first').next().addClass('activeslide');	//Update active slide
 			inAnimation = false;
-
+			
+			resizenow();
 		}
         
         $.supersized.go = go;
